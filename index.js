@@ -28,11 +28,38 @@ async function run() {
       const result = await cursor.toArray()
       res.send(result)
     })
+    app.get('/spots/:id', async(req, res)=>{
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await spotCollection.findOne(query)
+      res.send(result)
+    })
     
     app.post('/spots', async(req, res)=>{
      const newSpots = req.body
       console.log(newSpots)
       const result = await spotCollection.insertOne(newSpots)
+      res.send(result)
+    })
+    app.put('/spots/:id', async(req, res)=>{
+      const id = req.params.id
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true}
+      const updatedSpots = req.body
+      const spots = {
+        $set:{
+          image: updatedSpots.image, 
+          spotName: updatedSpots.spotName,
+          countryName: updatedSpots.countryName,
+          location: updatedSpots.location,
+          description: updatedSpots.description,
+          cost: updatedSpots.cost,
+          seasonality: updatedSpots.seasonality,
+          travelTime: updatedSpots.travelTime,
+          totalVisitors:updatedSpots.totalVisitors
+        }
+      }
+      const result = await spotCollection.updateOne(filter,spots,options)
       res.send(result)
     })
     app.delete('/spots/:id', async(req, res) =>{
